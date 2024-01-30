@@ -1,0 +1,41 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Router
+    network: arbitrum-one
+    source:
+      address: "0x141fa059441E0ca23ce184B6A78bafD2A517DdE8"
+      abi: Router
+      startBlock: 152698611
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - MessageExecuted
+        - OffRampAdded
+        - OffRampRemoved
+        - OnRampSet
+        - OwnershipTransferRequested
+        - OwnershipTransferred
+      abis:
+        - name: Router
+          file: ./abis/Router.json
+      eventHandlers:
+        - event: MessageExecuted(bytes32,uint64,address,bytes32)
+          handler: handleMessageExecuted
+        - event: OffRampAdded(indexed uint64,address)
+          handler: handleOffRampAdded
+        - event: OffRampRemoved(indexed uint64,address)
+          handler: handleOffRampRemoved
+        - event: OnRampSet(indexed uint64,address)
+          handler: handleOnRampSet
+        - event: OwnershipTransferRequested(indexed address,indexed address)
+          handler: handleOwnershipTransferRequested
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+      file: ./src/router.ts

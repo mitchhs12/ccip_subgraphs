@@ -108,12 +108,17 @@ describe("OffRamp", () => {
   });
 
   test("Can view message from offramp", () => {
-    assert.fieldEquals(
-      "OffRamp",
-      "0x46b639a3c1a4cbfd326b94a2db7415c27157282f",
-      "Messages",
-      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575"
-    );
+    let offRampAddress = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let messageId = Bytes.fromHexString("0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575");
+    let offRamp = new OffRamp(offRampAddress);
+    offRamp.save();
+    let message = new Message(messageId);
+    message.save();
+    assert.assertNull(offRamp.get("Messages"));
+    offRamp = OffRamp.load(offRampAddress)!;
+    let messages = offRamp.Messages;
+    assert.i32Equals(1, messages.length);
+    assert.stringEquals(messageId.toHexString(), messages[0].id);
   });
 });
 

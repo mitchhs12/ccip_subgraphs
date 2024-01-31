@@ -8,6 +8,7 @@ import {
 import { EVM2EVMOffRamp } from "../generated/Router/EVM2EVMOffRamp";
 import { Message, OffRamp, OnRamp } from "../generated/schema";
 import { nameFromSource } from "./sourceChainName";
+import { Address, Bytes } from "@graphprotocol/graph-ts";
 
 export function handleMessageExecuted(event: MessageExecutedEvent): void {
   let offRamp = OffRamp.load(event.params.offRamp);
@@ -35,7 +36,9 @@ export function handleOffRampAdded(event: OffRampAddedEvent): void {
   }
   let EVM2EVMOffRampContract = EVM2EVMOffRamp.bind(event.params.offRamp);
   let supportedTokens = EVM2EVMOffRampContract.try_getSupportedTokens();
-  offRamp.supportedTokens = supportedTokens.reverted ? [] : supportedTokens.value;
+  offRamp.supportedTokens = supportedTokens.reverted
+    ? []
+    : supportedTokens.value.map<Bytes>((address) => Bytes.fromUint8Array(address));
   offRamp.isActive = true;
 
   offRamp.blockNumberLastUpdated = event.block.number;

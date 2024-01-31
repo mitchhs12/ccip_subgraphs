@@ -1,5 +1,14 @@
-import { assert, describe, test, clearStore, beforeAll, afterAll } from "matchstick-as/assembly/index";
-import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts";
+import {
+  assert,
+  describe,
+  test,
+  clearStore,
+  beforeAll,
+  afterAll,
+  createMockedFunction,
+} from "matchstick-as/assembly/index";
+import { EVM2EVMOffRamp } from "../generated/Router/EVM2EVMOffRamp";
+import { Bytes, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { handleMessageExecuted, handleOffRampAdded, handleOffRampRemoved, handleOnRampSet } from "../src/router";
 import {
   createMessageExecutedEvent,
@@ -23,7 +32,14 @@ describe("handleNewMessage", () => {
   });
 
   test("A Message was not able to be created", () => {
-    assert.entityCount("Message", 1);
+    assert.entityCount("Message", 0);
+  });
+
+  test("A message is able to be created after an offRamp is created", () => {
+    let sourceChainSelector = BigInt.fromString("9284632837123596123");
+    let offRamp = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let newOffRampEvent = createOffRampAddedEvent(sourceChainSelector, offRamp);
+    handleOffRampAdded(newOffRampEvent);
   });
 
   test("Message created and stored", () => {
@@ -54,6 +70,21 @@ describe("handleNewOnRamp", () => {
     let offRamp = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
     let newOffRampEvent = createOffRampAddedEvent(sourceChainSelector, offRamp);
     handleOffRampAdded(newOffRampEvent);
+    const returnArray = ethereum.Value.fromAddressArray([
+      Address.fromString("0x90cba2bbb19ecc291a12066fd8329d65fa1f1947"),
+    ]);
+
+    let contractAddress = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7");
+    createMockedFunction(contractAddress, "getSupportedTokens", "getSupportedTokens():(address[]), params: []")
+      .withArgs([])
+      .returns([returnArray]);
+
+    let contract = EVM2EVMOffRamp.bind(contractAddress);
+    let result = contract.getSupportedTokens();
+    assert.equals(
+      ethereum.Value.fromAddress(result[0]),
+      ethereum.Value.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+    );
   });
 
   afterAll(() => {

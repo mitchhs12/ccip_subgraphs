@@ -7,18 +7,21 @@ import {
 } from "../generated/Router/Router";
 import { EVM2EVMOffRamp } from "../generated/Router/EVM2EVMOffRamp";
 import { Message, OffRamp, OnRamp } from "../generated/schema";
+import { nameFromSource } from "./sourceChainName";
 
 export function handleMessageExecuted(event: MessageExecutedEvent): void {
+  let offRamp = OffRamp.load(event.params.offRamp);
   let message = new Message(event.params.messageId);
-  message.sourceChainSelector = event.params.sourceChainSelector;
-  message.offRampName = "Arbitrum";
-  message.offRampAddress = event.params.offRamp;
-  message.calldataHash = event.params.calldataHash;
+  if (offRamp) {
+    // offRamp will always exist and be approved before a valid message is received.
+    message.offRamp = offRamp.id;
+    message.calldataHash = event.params.calldataHash;
 
-  message.blockNumber = event.block.number;
-  message.blockTimestamp = event.block.timestamp;
-  message.transactionHash = event.transaction.hash;
-  message.save();
+    message.blockNumber = event.block.number;
+    message.blockTimestamp = event.block.timestamp;
+    message.transactionHash = event.transaction.hash;
+    message.save();
+  }
 }
 
 export function handleOffRampAdded(event: OffRampAddedEvent): void {
@@ -26,12 +29,15 @@ export function handleOffRampAdded(event: OffRampAddedEvent): void {
   if (offRamp === null) {
     // If offRamp does not exist, create it.
     offRamp = new OffRamp(event.params.offRamp);
-    let EVM2EVMOffRampContract = EVM2EVMOffRamp.bind(event.params.offRamp);
-    offRamp.supportedTokens = EVM2EVMOffRampContract.getSupportedTokens();
-    offRamp.name = "Arbitrum";
+    let name = nameFromSource.get(event.params.sourceChainSelector.toString());
+    offRamp.name = name ? name : "Unknown Source Chain";
     offRamp.sourceChainSelector = event.params.sourceChainSelector;
   }
+  let EVM2EVMOffRampContract = EVM2EVMOffRamp.bind(event.params.offRamp);
+  let supportedTokens = EVM2EVMOffRampContract.try_getSupportedTokens();
+  offRamp.supportedTokens = supportedTokens.reverted ? [] : supportedTokens.value;
   offRamp.isActive = true;
+
   offRamp.blockNumberLastUpdated = event.block.number;
   offRamp.blockTimestampLastUpdated = event.block.timestamp;
   offRamp.transactionHashLastUpdated = event.transaction.hash;
@@ -52,9 +58,10 @@ export function handleOffRampRemoved(event: OffRampRemovedEvent): void {
 export function handleOnRampSet(event: OnRampSetEvent): void {
   let onRamp = new OnRamp(event.params.onRamp);
   let contract = Router.bind(event.params.onRamp);
+  let typeAndVersion = contract.try_typeAndVersion();
+  onRamp.typeAndVersion = typeAndVersion.reverted ? "Unknown" : typeAndVersion.value;
+
   onRamp.destChainSelector = event.params.destChainSelector;
-  onRamp.blockNumberLastUpdated = event.block.number;
-  onRamp.typeAndVersion = contract.typeAndVersion();
   onRamp.blockNumberLastUpdated = event.block.number;
   onRamp.blockTimestampLastUpdated = event.block.timestamp;
   onRamp.transactionHashLastUpdated = event.transaction.hash;

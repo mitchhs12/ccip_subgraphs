@@ -22,7 +22,7 @@ describe("handleNewMessage", () => {
     clearStore();
   });
 
-  test("A Message was created", () => {
+  test("A Message was not able to be created", () => {
     assert.entityCount("Message", 1);
   });
 

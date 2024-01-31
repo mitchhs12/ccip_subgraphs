@@ -8,7 +8,7 @@ import {
 import { EVM2EVMOffRamp } from "../generated/Router/EVM2EVMOffRamp";
 import { Message, OffRamp, OnRamp } from "../generated/schema";
 import { nameFromSource } from "./sourceChainName";
-import { Address, Bytes } from "@graphprotocol/graph-ts";
+import { Bytes } from "@graphprotocol/graph-ts";
 
 export function handleMessageExecuted(event: MessageExecutedEvent): void {
   let offRamp = OffRamp.load(event.params.offRamp);

@@ -20,8 +20,6 @@ dataSources:
         - OffRampAdded
         - OffRampRemoved
         - OnRampSet
-        - OwnershipTransferRequested
-        - OwnershipTransferred
       abis:
         - name: Router
           file: ./abis/Router.json
@@ -34,8 +32,4 @@ dataSources:
           handler: handleOffRampRemoved
         - event: OnRampSet(indexed uint64,address)
           handler: handleOnRampSet
-        - event: OwnershipTransferRequested(indexed address,indexed address)
-          handler: handleOwnershipTransferRequested
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
       file: ./src/router.ts

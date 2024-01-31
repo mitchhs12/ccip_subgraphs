@@ -1,74 +1,124 @@
+import { assert, describe, test, clearStore, beforeAll, afterAll } from "matchstick-as/assembly/index";
+import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts";
+import { handleMessageExecuted, handleOffRampAdded, handleOffRampRemoved, handleOnRampSet } from "../src/router";
 import {
-  assert,
-  describe,
-  test,
-  clearStore,
-  beforeAll,
-  afterAll
-} from "matchstick-as/assembly/index"
-import { Bytes, BigInt, Address } from "@graphprotocol/graph-ts"
-import { MessageExecuted } from "../generated/schema"
-import { MessageExecuted as MessageExecutedEvent } from "../generated/Router/Router"
-import { handleMessageExecuted } from "../src/router"
-import { createMessageExecutedEvent } from "./router-utils"
+  createMessageExecutedEvent,
+  createOffRampAddedEvent,
+  createOffRampRemovedEvent,
+  createOnRampSetEvent,
+} from "./router-utils";
 
-// Tests structure (matchstick-as >=0.5.0)
-// https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
-
-describe("Describe entity assertions", () => {
+describe("handleNewMessage", () => {
   beforeAll(() => {
-    let messageId = Bytes.fromI32(1234567890)
-    let sourceChainSelector = BigInt.fromI32(234)
-    let offRamp = Address.fromString(
-      "0x0000000000000000000000000000000000000001"
-    )
-    let calldataHash = Bytes.fromI32(1234567890)
-    let newMessageExecutedEvent = createMessageExecutedEvent(
-      messageId,
-      sourceChainSelector,
-      offRamp,
-      calldataHash
-    )
-    handleMessageExecuted(newMessageExecutedEvent)
-  })
+    let messageId = Bytes.fromHexString("0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575");
+    let sourceChainSelector = BigInt.fromString("9284632837123596123");
+    let offRamp = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let calldataHash = Bytes.fromHexString("0xC1B87E59BDF3D0DC9389D03BE40170EB3547776BFB7839BFE668B97FB3894013");
+    let newMessageExecutedEvent = createMessageExecutedEvent(messageId, sourceChainSelector, offRamp, calldataHash);
+    handleMessageExecuted(newMessageExecutedEvent);
+  });
 
   afterAll(() => {
-    clearStore()
-  })
+    clearStore();
+  });
 
-  // For more test scenarios, see:
-  // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
+  test("A Message was created", () => {
+    assert.entityCount("Message", 1);
+  });
 
-  test("MessageExecuted created and stored", () => {
-    assert.entityCount("MessageExecuted", 1)
-
-    // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
+  test("Message created and stored", () => {
     assert.fieldEquals(
-      "MessageExecuted",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "messageId",
-      "1234567890"
-    )
-    assert.fieldEquals(
-      "MessageExecuted",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "Message",
+      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575",
       "sourceChainSelector",
-      "234"
-    )
+      "9284632837123596123"
+    );
     assert.fieldEquals(
-      "MessageExecuted",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "offRamp",
-      "0x0000000000000000000000000000000000000001"
-    )
+      "Message",
+      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575",
+      "offRampAddress",
+      "0x46b639a3c1a4cbfd326b94a2db7415c27157282f"
+    );
     assert.fieldEquals(
-      "MessageExecuted",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "Message",
+      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575",
       "calldataHash",
-      "1234567890"
-    )
+      "0xc1b87e59bdf3d0dc9389d03be40170eb3547776bfb7839bfe668b97fb3894013"
+    );
+  });
+});
 
-    // More assert options:
-    // https://thegraph.com/docs/en/developer/matchstick/#asserts
-  })
-})
+describe("handleNewOnRamp", () => {
+  beforeAll(() => {
+    let sourceChainSelector = BigInt.fromString("9284632837123596123");
+    let offRamp = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let newOffRampEvent = createOffRampAddedEvent(sourceChainSelector, offRamp);
+    handleOffRampAdded(newOffRampEvent);
+  });
+
+  afterAll(() => {
+    clearStore();
+  });
+
+  test("Offramp can be added", () => {
+    assert.entityCount("OffRamp", 1);
+  });
+
+  test("Offramp is stored properly", () => {
+    assert.fieldEquals(
+      "OffRamp",
+      "0x46b639a3c1a4cbfd326b94a2db7415c27157282f",
+      "sourceChainSelector",
+      "9284632837123596123"
+    );
+    assert.fieldEquals("OffRamp", "0x46b639a3c1a4cbfd326b94a2db7415c27157282f", "name", "Arbitrum");
+  });
+
+  test("Offramp is stored and then deactivated when removed", () => {
+    assert.entityCount("OffRamp", 1);
+    assert.fieldEquals("OffRamp", "0x46b639a3c1a4cbfd326b94a2db7415c27157282f", "isActive", "true");
+    let sourceChainSelector = BigInt.fromString("9284632837123596123");
+    let offRamp = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let newOffRampEvent = createOffRampRemovedEvent(sourceChainSelector, offRamp);
+    handleOffRampRemoved(newOffRampEvent);
+    assert.fieldEquals("OffRamp", "0x46b639a3c1a4cbfd326b94a2db7415c27157282f", "isActive", "false");
+    assert.entityCount("OffRamp", 1);
+  });
+});
+
+describe("handleOnRampSet", () => {
+  beforeAll(() => {
+    let sourceChainSelector = BigInt.fromString("9284632837123596123");
+    let onRamp = Address.fromString("0xedFc22336Eb0B9B11Ff37C07777db27BCcDe3C65");
+    let onRampSetEvent = createOnRampSetEvent(sourceChainSelector, onRamp);
+    handleOnRampSet(onRampSetEvent);
+  });
+
+  afterAll(() => {
+    clearStore();
+  });
+
+  test("OnRamp can be added", () => {
+    assert.entityCount("OnRamp", 1);
+  });
+
+  test("OnRamp is stored properly", () => {
+    assert.fieldEquals(
+      "OnRamp",
+      "0xedFc22336Eb0B9B11Ff37C07777db27BCcDe3C65",
+      "sourceChainSelector",
+      "9284632837123596123"
+    );
+  });
+
+  test("OnRamp is stored and then deactivated when removed", () => {
+    assert.entityCount("OffRamp", 1);
+    assert.fieldEquals("OffRamp", "0x46b639a3c1a4cbfd326b94a2db7415c27157282f", "isActive", "true");
+    let sourceChainSelector = BigInt.fromString("9284632837123596123");
+    let offRamp = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let newOffRampEvent = createOffRampRemovedEvent(sourceChainSelector, offRamp);
+    handleOffRampRemoved(newOffRampEvent);
+    assert.fieldEquals("OffRamp", "0x46b639a3c1a4cbfd326b94a2db7415c27157282f", "isActive", "false");
+    assert.entityCount("OffRamp", 1);
+  });
+});

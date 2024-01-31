@@ -3,104 +3,47 @@ import {
   OffRampAdded as OffRampAddedEvent,
   OffRampRemoved as OffRampRemovedEvent,
   OnRampSet as OnRampSetEvent,
-  OwnershipTransferRequested as OwnershipTransferRequestedEvent,
-  OwnershipTransferred as OwnershipTransferredEvent
-} from "../generated/Router/Router"
-import {
-  MessageExecuted,
-  OffRampAdded,
-  OffRampRemoved,
-  OnRampSet,
-  OwnershipTransferRequested,
-  OwnershipTransferred
-} from "../generated/schema"
+} from "../generated/Router/Router";
+import { Message, OffRamp, OnRamp } from "../generated/schema";
 
 export function handleMessageExecuted(event: MessageExecutedEvent): void {
-  let entity = new MessageExecuted(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.messageId = event.params.messageId
-  entity.sourceChainSelector = event.params.sourceChainSelector
-  entity.offRamp = event.params.offRamp
-  entity.calldataHash = event.params.calldataHash
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let message = new Message(event.params.messageId);
+  message.sourceChainSelector = event.params.sourceChainSelector;
+  message.offRampAddress = event.params.offRamp;
+  message.calldataHash = event.params.calldataHash;
+  message.blockNumberReceived = event.block.number;
+  message.blockTimestampReceived = event.block.timestamp;
+  message.transactionHash = event.transaction.hash;
+  message.save();
 }
 
 export function handleOffRampAdded(event: OffRampAddedEvent): void {
-  let entity = new OffRampAdded(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.sourceChainSelector = event.params.sourceChainSelector
-  entity.offRamp = event.params.offRamp
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let offRamp = new OffRamp(event.params.offRamp);
+  offRamp.sourceChainSelector = event.params.sourceChainSelector;
+  offRamp.name = "Arbitrum";
+  offRamp.isActive = true;
+  offRamp.transactionHash = event.transaction.hash;
+  offRamp.blockNumberModified = event.block.number;
+  offRamp.blockTimestampModified = event.block.timestamp;
+  offRamp.save();
 }
 
 export function handleOffRampRemoved(event: OffRampRemovedEvent): void {
-  let entity = new OffRampRemoved(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.sourceChainSelector = event.params.sourceChainSelector
-  entity.offRamp = event.params.offRamp
+  let offRamp = OffRamp.load(event.params.offRamp);
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  // We return early if offRamp does not exist.
+  if (offRamp === null) {
+    return;
+  }
+  offRamp.isActive = false;
+  offRamp.save();
 }
 
 export function handleOnRampSet(event: OnRampSetEvent): void {
-  let entity = new OnRampSet(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.destChainSelector = event.params.destChainSelector
-  entity.onRamp = event.params.onRamp
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleOwnershipTransferRequested(
-  event: OwnershipTransferRequestedEvent
-): void {
-  let entity = new OwnershipTransferRequested(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.from = event.params.from
-  entity.to = event.params.to
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleOwnershipTransferred(
-  event: OwnershipTransferredEvent
-): void {
-  let entity = new OwnershipTransferred(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.from = event.params.from
-  entity.to = event.params.to
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  let onRamp = new OnRamp(event.params.onRamp);
+  onRamp.destChainSelector = event.params.destChainSelector;
+  onRamp.blockNumber = event.block.number;
+  onRamp.blockTimestamp = event.block.timestamp;
+  onRamp.transactionHash = event.transaction.hash;
+  onRamp.save();
 }

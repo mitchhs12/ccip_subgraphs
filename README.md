@@ -1,5 +1,10 @@
 # CCIP Subgraphs
 
+### The following folders contains subgraphs for all of the CCIP router contracts deployed on their major chains.
+
+Due to the architecture of CCIP, the data that is emitted by the `Router` contract is hashed with Keccak.
+This means that if the `Receiver` contract does not emit the raw data, the only way to see that data is to look at the CCIP (oracle) explorer.
+
 ### Ethereum mainnet
 
 Router Address: 0x80226fc0Ee2b096224EeAc085Bb9a8cba1146f7D

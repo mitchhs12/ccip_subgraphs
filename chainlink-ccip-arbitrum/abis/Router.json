@@ -292,9 +292,7 @@
       }
     ],
     "name": "getFee",
-    "outputs": [
-      { "internalType": "uint256", "name": "fee", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "fee", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -333,13 +331,9 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint64", "name": "chainSelector", "type": "uint64" }
-    ],
+    "inputs": [{ "internalType": "uint64", "name": "chainSelector", "type": "uint64" }],
     "name": "getSupportedTokens",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -351,9 +345,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint64", "name": "chainSelector", "type": "uint64" }
-    ],
+    "inputs": [{ "internalType": "uint64", "name": "chainSelector", "type": "uint64" }],
     "name": "isChainSupported",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
@@ -435,9 +427,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "wrappedNative", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "wrappedNative", "type": "address" }],
     "name": "setWrappedNative",
     "outputs": [],
     "stateMutability": "nonpayable",

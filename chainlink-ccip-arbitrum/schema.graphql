@@ -1,55 +1,32 @@
-type MessageExecuted @entity(immutable: true) {
-  id: Bytes!
-  messageId: Bytes! # bytes32
+type Message @entity(immutable: true) {
+  id: Bytes! # messageId - bytes32
   sourceChainSelector: BigInt! # uint64
-  offRamp: Bytes! # address
+  offRampAddress: Bytes! # address
   calldataHash: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
+  blockNumberReceived: BigInt!
+  blockTimestampReceived: BigInt!
   transactionHash: Bytes!
 }
 
-type OffRampAdded @entity(immutable: true) {
-  id: Bytes!
+# the router contract can have multiple offRamps
+type OffRamp @entity {
+  id: Bytes! # address - offRamp
+  name: String! # name of the offRamp
+  isActive: Boolean! # is the offRamp active?
   sourceChainSelector: BigInt! # uint64
-  offRamp: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  supportedTokens: [Bytes!]! # array of addresses of destination tokens
+  typeAndVersion: String! # type and version of the offRamp
+  blockNumberModified: BigInt!
+  blockTimestampModified: BigInt!
+  transactionHashLastModified: Bytes!
 }
 
-type OffRampRemoved @entity(immutable: true) {
-  id: Bytes!
-  sourceChainSelector: BigInt! # uint64
-  offRamp: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OnRampSet @entity(immutable: true) {
-  id: Bytes!
+# the router contract can only have one onRamp (EVM2EVM onRamp contract) - Doesn't have a name since it can be any network
+type OnRamp @entity(immutable: true) {
+  id: Bytes! # address - onRamp
   destChainSelector: BigInt! # uint64
-  onRamp: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OwnershipTransferRequested @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OwnershipTransferred @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  typeAndVersion: String! # type and version of the onRamp
+  blockNumberModified: BigInt!
+  blockTimestampModified: BigInt!
+  transactionHashLastModified: Bytes!
 }

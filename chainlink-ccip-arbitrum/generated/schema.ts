@@ -108,19 +108,6 @@ export class OffRamp extends Entity {
     }
   }
 
-  get typeAndVersion(): string {
-    let value = this.get("typeAndVersion");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toString();
-    }
-  }
-
-  set typeAndVersion(value: string) {
-    this.set("typeAndVersion", Value.fromString(value));
-  }
-
   get blockNumberLastUpdated(): BigInt {
     let value = this.get("blockNumberLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {

@@ -5,7 +5,6 @@ type OffRamp @entity {
   sourceChainSelector: BigInt! # uint64
   isActive: Boolean! # is the offRamp active?
   supportedTokens: [Bytes!] # array of addresses of destination tokens
-  typeAndVersion: String! # type and version of the offRamp
   blockNumberLastUpdated: BigInt!
   blockTimestampLastUpdated: BigInt!
   transactionHashLastUpdated: Bytes!

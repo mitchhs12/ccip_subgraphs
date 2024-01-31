@@ -23,6 +23,8 @@ dataSources:
       abis:
         - name: Router
           file: ./abis/Router.json
+        - name: EVM2EVMOffRamp
+          file: ./abis/EVM2EVMOffRamp.json
       eventHandlers:
         - event: MessageExecuted(bytes32,uint64,address,bytes32)
           handler: handleMessageExecuted

@@ -52,6 +52,19 @@ export class Message extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get offRampName(): string {
+    let value = this.get("offRampName");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set offRampName(value: string) {
+    this.set("offRampName", Value.fromString(value));
+  }
+
   get sourceChainSelector(): BigInt {
     let value = this.get("sourceChainSelector");
     if (!value || value.kind == ValueKind.NULL) {
@@ -91,8 +104,8 @@ export class Message extends Entity {
     this.set("calldataHash", Value.fromBytes(value));
   }
 
-  get blockNumberReceived(): BigInt {
-    let value = this.get("blockNumberReceived");
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -100,12 +113,12 @@ export class Message extends Entity {
     }
   }
 
-  set blockNumberReceived(value: BigInt) {
-    this.set("blockNumberReceived", Value.fromBigInt(value));
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
   }
 
-  get blockTimestampReceived(): BigInt {
-    let value = this.get("blockTimestampReceived");
+  get blockTimestamp(): BigInt {
+    let value = this.get("blockTimestamp");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -113,8 +126,8 @@ export class Message extends Entity {
     }
   }
 
-  set blockTimestampReceived(value: BigInt) {
-    this.set("blockTimestampReceived", Value.fromBigInt(value));
+  set blockTimestamp(value: BigInt) {
+    this.set("blockTimestamp", Value.fromBigInt(value));
   }
 
   get transactionHash(): Bytes {
@@ -211,8 +224,34 @@ export class OffRamp extends Entity {
     this.set("sourceChainSelector", Value.fromBigInt(value));
   }
 
-  get blockNumberModified(): BigInt {
-    let value = this.get("blockNumberModified");
+  get supportedTokens(): Array<Bytes> {
+    let value = this.get("supportedTokens");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytesArray();
+    }
+  }
+
+  set supportedTokens(value: Array<Bytes>) {
+    this.set("supportedTokens", Value.fromBytesArray(value));
+  }
+
+  get typeAndVersion(): string {
+    let value = this.get("typeAndVersion");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set typeAndVersion(value: string) {
+    this.set("typeAndVersion", Value.fromString(value));
+  }
+
+  get blockNumberLastUpdated(): BigInt {
+    let value = this.get("blockNumberLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -220,12 +259,12 @@ export class OffRamp extends Entity {
     }
   }
 
-  set blockNumberModified(value: BigInt) {
-    this.set("blockNumberModified", Value.fromBigInt(value));
+  set blockNumberLastUpdated(value: BigInt) {
+    this.set("blockNumberLastUpdated", Value.fromBigInt(value));
   }
 
-  get blockTimestampModified(): BigInt {
-    let value = this.get("blockTimestampModified");
+  get blockTimestampLastUpdated(): BigInt {
+    let value = this.get("blockTimestampLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -233,12 +272,12 @@ export class OffRamp extends Entity {
     }
   }
 
-  set blockTimestampModified(value: BigInt) {
-    this.set("blockTimestampModified", Value.fromBigInt(value));
+  set blockTimestampLastUpdated(value: BigInt) {
+    this.set("blockTimestampLastUpdated", Value.fromBigInt(value));
   }
 
-  get transactionHash(): Bytes {
-    let value = this.get("transactionHash");
+  get transactionHashLastUpdated(): Bytes {
+    let value = this.get("transactionHashLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -246,8 +285,8 @@ export class OffRamp extends Entity {
     }
   }
 
-  set transactionHash(value: Bytes) {
-    this.set("transactionHash", Value.fromBytes(value));
+  set transactionHashLastUpdated(value: Bytes) {
+    this.set("transactionHashLastUpdated", Value.fromBytes(value));
   }
 }
 
@@ -305,8 +344,21 @@ export class OnRamp extends Entity {
     this.set("destChainSelector", Value.fromBigInt(value));
   }
 
-  get blockNumber(): BigInt {
-    let value = this.get("blockNumber");
+  get typeAndVersion(): string {
+    let value = this.get("typeAndVersion");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set typeAndVersion(value: string) {
+    this.set("typeAndVersion", Value.fromString(value));
+  }
+
+  get blockNumberLastUpdated(): BigInt {
+    let value = this.get("blockNumberLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -314,12 +366,12 @@ export class OnRamp extends Entity {
     }
   }
 
-  set blockNumber(value: BigInt) {
-    this.set("blockNumber", Value.fromBigInt(value));
+  set blockNumberLastUpdated(value: BigInt) {
+    this.set("blockNumberLastUpdated", Value.fromBigInt(value));
   }
 
-  get blockTimestamp(): BigInt {
-    let value = this.get("blockTimestamp");
+  get blockTimestampLastUpdated(): BigInt {
+    let value = this.get("blockTimestampLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -327,12 +379,12 @@ export class OnRamp extends Entity {
     }
   }
 
-  set blockTimestamp(value: BigInt) {
-    this.set("blockTimestamp", Value.fromBigInt(value));
+  set blockTimestampLastUpdated(value: BigInt) {
+    this.set("blockTimestampLastUpdated", Value.fromBigInt(value));
   }
 
-  get transactionHash(): Bytes {
-    let value = this.get("transactionHash");
+  get transactionHashLastUpdated(): Bytes {
+    let value = this.get("transactionHashLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -340,7 +392,7 @@ export class OnRamp extends Entity {
     }
   }
 
-  set transactionHash(value: Bytes) {
-    this.set("transactionHash", Value.fromBytes(value));
+  set transactionHashLastUpdated(value: Bytes) {
+    this.set("transactionHashLastUpdated", Value.fromBytes(value));
   }
 }

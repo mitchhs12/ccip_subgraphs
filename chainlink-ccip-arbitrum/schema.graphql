@@ -1,10 +1,11 @@
 type Message @entity(immutable: true) {
   id: Bytes! # messageId - bytes32
-  sourceChainSelector: BigInt! # uint64
-  offRampAddress: Bytes! # address
+  offRampName: String! # name of the offRamp (where the message came from)
+  sourceChainSelector: BigInt! # uint64 (the chainId of the offRamp)
+  offRampAddress: Bytes! # address (the address of the arbitrum offRamp contract)
   calldataHash: Bytes! # bytes32
-  blockNumberReceived: BigInt!
-  blockTimestampReceived: BigInt!
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
@@ -16,9 +17,9 @@ type OffRamp @entity {
   sourceChainSelector: BigInt! # uint64
   supportedTokens: [Bytes!]! # array of addresses of destination tokens
   typeAndVersion: String! # type and version of the offRamp
-  blockNumberModified: BigInt!
-  blockTimestampModified: BigInt!
-  transactionHashLastModified: Bytes!
+  blockNumberLastUpdated: BigInt!
+  blockTimestampLastUpdated: BigInt!
+  transactionHashLastUpdated: Bytes!
 }
 
 # the router contract can only have one onRamp (EVM2EVM onRamp contract) - Doesn't have a name since it can be any network
@@ -26,7 +27,7 @@ type OnRamp @entity(immutable: true) {
   id: Bytes! # address - onRamp
   destChainSelector: BigInt! # uint64
   typeAndVersion: String! # type and version of the onRamp
-  blockNumberModified: BigInt!
-  blockTimestampModified: BigInt!
-  transactionHashLastModified: Bytes!
+  blockNumberLastUpdated: BigInt!
+  blockTimestampLastUpdated: BigInt!
+  transactionHashLastUpdated: Bytes!
 }

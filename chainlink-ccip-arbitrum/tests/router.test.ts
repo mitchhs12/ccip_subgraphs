@@ -10,6 +10,7 @@ import {
   beforeEach,
 } from "matchstick-as/assembly/index";
 import { log } from "matchstick-as/assembly/log";
+import { Message, OffRamp, OnRamp } from "../generated/schema";
 
 import { EVM2EVMOffRamp } from "../generated/Router/EVM2EVMOffRamp";
 import { Bytes, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
@@ -105,6 +106,15 @@ describe("OffRamp", () => {
       "0xc1b87e59bdf3d0dc9389d03be40170eb3547776bfb7839bfe668b97fb3894013"
     );
   });
+
+  test("Can view message from offramp", () => {
+    assert.fieldEquals(
+      "OffRamp",
+      "0x46b639a3c1a4cbfd326b94a2db7415c27157282f",
+      "Messages",
+      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575"
+    );
+  });
 });
 
 // MESSAGE EXECUTED
@@ -137,8 +147,6 @@ describe("handleOnRampSet", () => {
     let contract = EVM2EVMOffRamp.bind(contractAddress);
     let result = contract.typeAndVersion();
     assert.equals(ethereum.Value.fromString(result), mockTypeAndVersion); // mock function successfully working
-
-    log.info("handleOnRampSet {}", [result]);
 
     let destChainSelector = BigInt.fromString("9284632837123596123");
     let onRamp = Address.fromString("0xedfc22336eb0b9b11ff37c07777db27bccde3c65");

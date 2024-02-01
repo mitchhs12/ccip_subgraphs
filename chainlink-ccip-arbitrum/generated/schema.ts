@@ -108,6 +108,19 @@ export class OffRamp extends Entity {
     }
   }
 
+  get typeAndVersion(): string {
+    let value = this.get("typeAndVersion");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set typeAndVersion(value: string) {
+    this.set("typeAndVersion", Value.fromString(value));
+  }
+
   get blockNumberLastUpdated(): BigInt {
     let value = this.get("blockNumberLastUpdated");
     if (!value || value.kind == ValueKind.NULL) {
@@ -197,6 +210,19 @@ export class OnRamp extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get name(): string {
+    let value = this.get("name");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
+  }
+
   get destChainSelector(): BigInt {
     let value = this.get("destChainSelector");
     if (!value || value.kind == ValueKind.NULL) {
@@ -223,8 +249,8 @@ export class OnRamp extends Entity {
     this.set("typeAndVersion", Value.fromString(value));
   }
 
-  get blockNumberLastUpdated(): BigInt {
-    let value = this.get("blockNumberLastUpdated");
+  get blockNumberSet(): BigInt {
+    let value = this.get("blockNumberSet");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -232,12 +258,12 @@ export class OnRamp extends Entity {
     }
   }
 
-  set blockNumberLastUpdated(value: BigInt) {
-    this.set("blockNumberLastUpdated", Value.fromBigInt(value));
+  set blockNumberSet(value: BigInt) {
+    this.set("blockNumberSet", Value.fromBigInt(value));
   }
 
-  get blockTimestampLastUpdated(): BigInt {
-    let value = this.get("blockTimestampLastUpdated");
+  get blockTimestampSet(): BigInt {
+    let value = this.get("blockTimestampSet");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -245,12 +271,12 @@ export class OnRamp extends Entity {
     }
   }
 
-  set blockTimestampLastUpdated(value: BigInt) {
-    this.set("blockTimestampLastUpdated", Value.fromBigInt(value));
+  set blockTimestampSet(value: BigInt) {
+    this.set("blockTimestampSet", Value.fromBigInt(value));
   }
 
-  get transactionHashLastUpdated(): Bytes {
-    let value = this.get("transactionHashLastUpdated");
+  get transactionHashSet(): Bytes {
+    let value = this.get("transactionHashSet");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -258,8 +284,8 @@ export class OnRamp extends Entity {
     }
   }
 
-  set transactionHashLastUpdated(value: Bytes) {
-    this.set("transactionHashLastUpdated", Value.fromBytes(value));
+  set transactionHashSet(value: Bytes) {
+    this.set("transactionHashSet", Value.fromBytes(value));
   }
 }
 

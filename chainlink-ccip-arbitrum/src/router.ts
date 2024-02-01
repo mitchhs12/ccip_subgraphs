@@ -39,6 +39,9 @@ export function handleOffRampAdded(event: OffRampAddedEvent): void {
   offRamp.supportedTokens = supportedTokens.reverted
     ? []
     : supportedTokens.value.map<Bytes>((address) => Bytes.fromUint8Array(address));
+
+  let typeAndVersion = EVM2EVMOffRampContract.try_typeAndVersion();
+  offRamp.typeAndVersion = typeAndVersion.reverted ? "Unknown" : typeAndVersion.value;
   offRamp.isActive = true;
 
   offRamp.blockNumberLastUpdated = event.block.number;
@@ -60,13 +63,16 @@ export function handleOffRampRemoved(event: OffRampRemovedEvent): void {
 
 export function handleOnRampSet(event: OnRampSetEvent): void {
   let onRamp = new OnRamp(event.params.onRamp);
+  let name = nameFromSource.get(event.params.destChainSelector.toString());
+  onRamp.name = name ? name : "Unknown Destination Chain";
   let contract = Router.bind(event.params.onRamp);
+
   let typeAndVersion = contract.try_typeAndVersion();
   onRamp.typeAndVersion = typeAndVersion.reverted ? "Unknown" : typeAndVersion.value;
 
   onRamp.destChainSelector = event.params.destChainSelector;
-  onRamp.blockNumberLastUpdated = event.block.number;
-  onRamp.blockTimestampLastUpdated = event.block.timestamp;
-  onRamp.transactionHashLastUpdated = event.transaction.hash;
+  onRamp.blockNumberSet = event.block.number;
+  onRamp.blockTimestampSet = event.block.timestamp;
+  onRamp.transactionHashSet = event.transaction.hash;
   onRamp.save();
 }

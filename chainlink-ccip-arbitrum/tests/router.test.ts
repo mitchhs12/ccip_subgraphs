@@ -22,16 +22,18 @@ import {
   createOnRampSetEvent,
 } from "./router-utils";
 
-// OFFRAMP
+///// OFFRAMP TESTS /////
 describe("OffRamp", () => {
   beforeEach(() => {
     let contractAddress = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
+    let mockTypeAndVersion = ethereum.Value.fromString("EVM2EVMOnRamp 1.2.0");
     let addressArray = ethereum.Value.fromAddressArray([
       Address.fromString("0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5"),
     ]);
     createMockedFunction(contractAddress, "getSupportedTokens", "getSupportedTokens():(address[])").returns([
       addressArray,
     ]);
+    createMockedFunction(contractAddress, "typeAndVersion", "typeAndVersion():(string)").returns([mockTypeAndVersion]);
 
     let contract = EVM2EVMOffRamp.bind(contractAddress);
     let result = contract.getSupportedTokens();
@@ -71,12 +73,15 @@ describe("OffRamp", () => {
 
   test("Handles if name is not found", () => {
     let offRampAddress2 = Address.fromString("0x09dbc4a902199bbe7f7ec29b3714731786f2e878");
+    let mockTypeAndVersion = ethereum.Value.fromString("EVM2EVMOnRamp 1.2.0");
     let addressArray = ethereum.Value.fromAddressArray([
       Address.fromString("0x95222290dd7278aa3ddd389cc1e1d165cc4bafe5"),
     ]);
     createMockedFunction(offRampAddress2, "getSupportedTokens", "getSupportedTokens():(address[])").returns([
       addressArray,
     ]);
+    createMockedFunction(offRampAddress2, "typeAndVersion", "typeAndVersion():(string)").returns([mockTypeAndVersion]);
+
     let sourceChainSelector = BigInt.fromString("9403546176061112136"); // unknown sourceChainSelector
     let offRamp = Address.fromString("0x09dbc4a902199bbe7f7ec29b3714731786f2e878");
     let newOffRampEvent = createOffRampAddedEvent(sourceChainSelector, offRamp);
@@ -96,33 +101,34 @@ describe("OffRamp", () => {
 
   test("A Message can be saved", () => {
     assert.entityCount("Message", 1);
-  });
-
-  test("A Message calldataHash is saved", () => {
     assert.fieldEquals(
       "Message",
       "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575",
-      "calldataHash",
-      "0xc1b87e59bdf3d0dc9389d03be40170eb3547776bfb7839bfe668b97fb3894013"
+      "id",
+      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575"
     );
+  });
+
+  test("Can view offRamp from message", () => {
+    let messageId = Bytes.fromHexString("0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575");
+    let message = Message.load(messageId)!;
+    assert.fieldEquals("Message", message.id.toHexString(), "offRamp", "0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
   });
 
   test("Can view message from offramp", () => {
     let offRampAddress = Address.fromString("0x46b639a3c1a4cbfd326b94a2db7415c27157282f");
-    let messageId = Bytes.fromHexString("0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575");
-    let offRamp = new OffRamp(offRampAddress);
-    offRamp.save();
-    let message = new Message(messageId);
-    message.save();
-    assert.assertNull(offRamp.get("Messages"));
-    offRamp = OffRamp.load(offRampAddress)!;
-    let messages = offRamp.Messages;
-    assert.i32Equals(1, messages.length);
-    assert.stringEquals(messageId.toHexString(), messages[0].id);
+    let offRamp = OffRamp.load(offRampAddress)!;
+    let messages = offRamp.Messages.load();
+    assert.fieldEquals(
+      "Message",
+      messages[0].id.toHexString(),
+      "id",
+      "0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575"
+    );
   });
 });
 
-// MESSAGE EXECUTED
+///// MESSAGE TESTS /////
 describe("Message", () => {
   beforeAll(() => {
     let messageId = Bytes.fromHexString("0x30a2aee56d769e573076b28748aabaccf31f7dd2d8199df527b35b714c799575");
@@ -142,29 +148,39 @@ describe("Message", () => {
   });
 });
 
-// ONRAMP
+///// ONRAMP TESTS /////
 describe("handleOnRampSet", () => {
   beforeEach(() => {
-    let contractAddress = Address.fromString("0xedfc22336eb0b9b11ff37c07777db27bccde3c65");
+    let onRampAddress = Address.fromString("0xedfc22336eb0b9b11ff37c07777db27bccde3c65");
     let mockTypeAndVersion = ethereum.Value.fromString("EVM2EVMOffRamp 1.2.0");
-    createMockedFunction(contractAddress, "typeAndVersion", "typeAndVersion():(string)").returns([mockTypeAndVersion]);
+    createMockedFunction(onRampAddress, "typeAndVersion", "typeAndVersion():(string)").returns([mockTypeAndVersion]);
 
-    let contract = EVM2EVMOffRamp.bind(contractAddress);
+    let contract = EVM2EVMOffRamp.bind(onRampAddress);
     let result = contract.typeAndVersion();
     assert.equals(ethereum.Value.fromString(result), mockTypeAndVersion); // mock function successfully working
 
     let destChainSelector = BigInt.fromString("9284632837123596123");
-    let onRamp = Address.fromString("0xedfc22336eb0b9b11ff37c07777db27bccde3c65");
-    let onRampSetEvent = createOnRampSetEvent(destChainSelector, onRamp);
+    let onRampSetEvent = createOnRampSetEvent(destChainSelector, onRampAddress);
     handleOnRampSet(onRampSetEvent);
   });
 
-  afterAll(() => {
+  afterEach(() => {
     clearStore();
   });
 
   test("OnRamp can be added", () => {
     assert.entityCount("OnRamp", 1);
+  });
+
+  // This test should theoretically never happen, but it's good to test for it.
+  test("OnRamp name is unknown", () => {
+    let onRampAddress = Address.fromString("0xdafea492d9c6733ae3d56b7ed1adb60692c98bc5");
+    let mockTypeAndVersion = ethereum.Value.fromString("EVM2EVMOnRamp 1.2.0");
+    createMockedFunction(onRampAddress, "typeAndVersion", "typeAndVersion():(string)").returns([mockTypeAndVersion]);
+    let destChainSelector = BigInt.fromString("1111111111111111111");
+    let onRampSetEvent = createOnRampSetEvent(destChainSelector, onRampAddress);
+    handleOnRampSet(onRampSetEvent);
+    assert.fieldEquals("OnRamp", "0xdafea492d9c6733ae3d56b7ed1adb60692c98bc5", "name", "Unknown Destination Chain");
   });
 
   test("OnRamp is stored properly", () => {
@@ -174,6 +190,29 @@ describe("handleOnRampSet", () => {
       "0xedfc22336eb0b9b11ff37c07777db27bccde3c65",
       "destChainSelector",
       "9284632837123596123"
+    );
+  });
+
+  test("OnRamp is updated properly", () => {
+    assert.entityCount("OnRamp", 1);
+    assert.fieldEquals(
+      "OnRamp",
+      "0xedfc22336eb0b9b11ff37c07777db27bccde3c65",
+      "destChainSelector",
+      "9284632837123596123"
+    );
+    let onRampAddress = Address.fromString("0x849c5ed5a80f5b408dd4969b78c2c8fdf0565bfe");
+    let mockTypeAndVersion = ethereum.Value.fromString("EVM2EVMOnRamp 1.2.0");
+    createMockedFunction(onRampAddress, "typeAndVersion", "typeAndVersion():(string)").returns([mockTypeAndVersion]);
+    let destChainSelector = BigInt.fromString("4051577828743386545");
+    let onRampSetEvent = createOnRampSetEvent(destChainSelector, onRampAddress);
+    handleOnRampSet(onRampSetEvent);
+    assert.entityCount("OnRamp", 2);
+    assert.fieldEquals(
+      "OnRamp",
+      "0x849c5ed5a80f5b408dd4969b78c2c8fdf0565bfe",
+      "destChainSelector",
+      "4051577828743386545"
     );
   });
 });

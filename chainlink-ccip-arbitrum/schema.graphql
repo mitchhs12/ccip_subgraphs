@@ -1,10 +1,12 @@
 # the router contract can have multiple offRamps
+# these can be added and removed by the owner of the router contract.
 type OffRamp @entity {
   id: Bytes! # address - offRamp
   name: String! # name of the offRamp
   sourceChainSelector: BigInt! # uint64
   isActive: Boolean! # is the offRamp active?
   supportedTokens: [Bytes!] # array of addresses of destination tokens
+  typeAndVersion: String! # type and version of the offRamp
   blockNumberLastUpdated: BigInt!
   blockTimestampLastUpdated: BigInt!
   transactionHashLastUpdated: Bytes!
@@ -12,15 +14,18 @@ type OffRamp @entity {
 }
 
 # the router contract must always only have one onRamp (EVM2EVM onRamp contract) - Doesn't have a name since it can be any EVM onRamp
+# the onRamp is unique.
 type OnRamp @entity {
-  id: Bytes! # address - onRamp
+  id: Bytes! # address of the currently set onRamp
+  name: String! # name of the onRamp
   destChainSelector: BigInt! # uint64
   typeAndVersion: String! # type and version of the onRamp
-  blockNumberLastUpdated: BigInt!
-  blockTimestampLastUpdated: BigInt!
-  transactionHashLastUpdated: Bytes!
+  blockNumberSet: BigInt!
+  blockTimestampSet: BigInt!
+  transactionHashSet: Bytes!
 }
 
+# the message entity is the message that is sent from the onRamp to the offRamp
 type Message @entity(immutable: true) {
   id: Bytes! # messageId - bytes32
   offRamp: OffRamp! # offRamp (where the message came from)

@@ -1,54 +1,35 @@
-type MessageExecuted @entity(immutable: true) {
-  id: Bytes!
-  messageId: Bytes! # bytes32
+# the router contract can have multiple offRamps
+# these can be added and removed by the owner of the router contract.
+type OffRamp @entity {
+  id: Bytes! # address - offRamp
+  name: String! # name of the offRamp
   sourceChainSelector: BigInt! # uint64
-  offRamp: Bytes! # address
-  calldataHash: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  isActive: Boolean! # is the offRamp active?
+  supportedTokens: [Bytes!] # array of addresses of destination tokens
+  typeAndVersion: String! # type and version of the offRamp
+  blockNumberLastUpdated: BigInt!
+  blockTimestampLastUpdated: BigInt!
+  transactionHashLastUpdated: Bytes!
+  Messages: [Message!] @derivedFrom(field: "offRamp") # messages that have been sent from the offRamp
 }
 
-type OffRampAdded @entity(immutable: true) {
-  id: Bytes!
-  sourceChainSelector: BigInt! # uint64
-  offRamp: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OffRampRemoved @entity(immutable: true) {
-  id: Bytes!
-  sourceChainSelector: BigInt! # uint64
-  offRamp: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OnRampSet @entity(immutable: true) {
-  id: Bytes!
+# the router contract must always only have one onRamp (EVM2EVM onRamp contract) - Doesn't have a name since it can be any EVM onRamp
+# the onRamp is unique.
+type OnRamp @entity {
+  id: Bytes! # address of the currently set onRamp
+  name: String! # name of the onRamp
   destChainSelector: BigInt! # uint64
-  onRamp: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  typeAndVersion: String! # type and version of the onRamp
+  blockNumberSet: BigInt!
+  blockTimestampSet: BigInt!
+  transactionHashSet: Bytes!
 }
 
-type OwnershipTransferRequested @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type OwnershipTransferred @entity(immutable: true) {
-  id: Bytes!
-  from: Bytes! # address
-  to: Bytes! # address
+# the message entity is the message that is sent from the onRamp to the offRamp
+type Message @entity(immutable: true) {
+  id: Bytes! # messageId - bytes32
+  offRamp: OffRamp! # offRamp (where the message came from)
+  calldataHash: Bytes! # bytes32
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

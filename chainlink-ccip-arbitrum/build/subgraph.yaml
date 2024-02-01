@@ -20,11 +20,11 @@ dataSources:
         - OffRampAdded
         - OffRampRemoved
         - OnRampSet
-        - OwnershipTransferRequested
-        - OwnershipTransferred
       abis:
         - name: Router
           file: Router/abis/Router.json
+        - name: EVM2EVMOffRamp
+          file: Router/abis/EVM2EVMOffRamp.json
       eventHandlers:
         - event: MessageExecuted(bytes32,uint64,address,bytes32)
           handler: handleMessageExecuted
@@ -34,8 +34,4 @@ dataSources:
           handler: handleOffRampRemoved
         - event: OnRampSet(indexed uint64,address)
           handler: handleOnRampSet
-        - event: OwnershipTransferRequested(indexed address,indexed address)
-          handler: handleOwnershipTransferRequested
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
       file: Router/Router.wasm

@@ -2,7 +2,7 @@ import { TypedMap } from "@graphprotocol/graph-ts/index";
 
 // nameFromSource = (key: sourceChainSelector, value: name)
 export const nameFromSource = new TypedMap<string, string>();
-nameFromSource.set("9284632837123596123", "Ethereum mainnet");
+nameFromSource.set("5009297550715157269", "Ethereum mainnet");
 nameFromSource.set("3734403246176062136", "Optimism mainnet");
 nameFromSource.set("4949039107694359620", "Arbitrum mainnet");
 nameFromSource.set("4051577828743386545", "Polygon mainnet");

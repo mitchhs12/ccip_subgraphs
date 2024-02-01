@@ -1,9 +1,17 @@
 # CCIP Subgraphs
 
-### The following folders contains subgraphs for all of the CCIP router contracts deployed on their major chains.
+### The following folders contains a subgraph for the CCIP router contract deployed on Arbitrum One on [01/25/2024](https://twitter.com/chainlink/status/1750580692252086512 "Announcement Tweet").
+
+This subgraph can be easily copied to index all CCIP router contracts on all chains. The full list of Router Addresses and Chain Selectors are below.
+
+CCIP works by having `offRamp` and `onRamp` contracts whereby each chain (for example, Arbitrum) has multiple `offRamp` contracts that can connect to it. onRamp contracts are the contracts that the router on Arbitrum uses to interact with the oracle network. Expressed visually:
+
+![Alt text](https://docs.chain.link/images/ccip/ccip-diagram-04_v04.webp "CCIP Architecture")
 
 Due to the architecture of CCIP, the data that is emitted by the `Router` contract is hashed with Keccak.
 This means that if the `Receiver` contract does not emit the raw data, the only way to see that data is to look at the CCIP (oracle) explorer.
+
+## Router Addresses and Chain Selectors
 
 ### Ethereum mainnet
 

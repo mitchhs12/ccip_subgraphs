@@ -8,7 +8,7 @@ I was initially going to do all of them but decided that I would just submit thi
 
 CCIP works by having `offRamp` and `onRamp` contracts whereby each chain (for example, Arbitrum) has multiple `offRamp` contracts that can connect to it. onRamp contracts are the contracts that the router on Arbitrum uses to interact with the oracle network. Expressed visually:
 
-![CCIP Diagram](https://docs.chain.link/images/ccip/ccip-diagram-04_v04.webp)
+[![CCIP Diagram](images/ccip-diagram-04_v04.webp)](https://github.com/mitchhs12/ccip_subgraphs/blob/main/images/ccip-diagram-04_v04.webp)
 
 Due to the architecture of CCIP, the data that is emitted by the `Router` contract is hashed with Keccak.
 This means that if the `Receiver` contract does not emit the raw data, the only way to see that data is to look at the CCIP (oracle) explorer.
